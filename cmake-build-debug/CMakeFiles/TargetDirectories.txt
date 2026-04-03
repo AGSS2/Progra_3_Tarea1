@@ -1,0 +1,3 @@
+C:/Users/Ingrid/CLion_Tareas/Tarea-1/cmake-build-debug/CMakeFiles/Tarea_1.dir
+C:/Users/Ingrid/CLion_Tareas/Tarea-1/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/Ingrid/CLion_Tareas/Tarea-1/cmake-build-debug/CMakeFiles/rebuild_cache.dir
