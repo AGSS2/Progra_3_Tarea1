@@ -4,13 +4,13 @@
 
 
 
-3 y 4 completo
+Nombre:
+
+* Adrian Valentino Gamboa Rodriguez
 
 
 
-6 en Avance
+Ejecución:
 
-
-
-Falta 5, 7, 8, 9 y 10
+La ejecución solo requiere de ingresar la matriz de datos. El constructor y los métodos no funcionaran si recibe una matriz con muchas dimensiones al estar condicionados, solo llega a aceptar matrices de máximo 3 dimensiones.
 

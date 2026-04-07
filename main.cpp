@@ -11,16 +11,17 @@ public:
 };
 
 class Tensor{
-    friend Tensor operator+(const Tensor a, const Tensor b);
-    friend Tensor operator-(const Tensor a, const Tensor b);
-    friend Tensor operator*(const Tensor a, const Tensor b);
+    friend Tensor operator+(const Tensor& a, const Tensor& b);
+    friend Tensor operator-(const Tensor& a, const Tensor& b);
+    friend Tensor operator*(const Tensor& a, const Tensor& b);
+    friend Tensor operator*(const Tensor& a, double n);
     friend class TensorTransform;
     double* dimen_1;
     double** dimen_2;
     double*** dimen_3;
     int fil = 0, col = 0, anch = 0;
 public:
-    Tensor(const vector<size_t>& shape, double* values){
+    Tensor(const vector<size_t>& shape, const double* values){
         dimen_1 = nullptr;
         dimen_2 = nullptr;
         dimen_3 = nullptr;
@@ -74,7 +75,7 @@ public:
             }
         }
 
-        if (other.dimen_2 != nullptr) {
+        else if (other.dimen_2 != nullptr) {
             dimen_2 = new double*[fil];
             for (int i=0; i<fil; i++){
                 dimen_2[i] = new double[col];
@@ -84,7 +85,7 @@ public:
             }
         }
 
-        if (other.dimen_3 != nullptr) {
+        else if (other.dimen_3 != nullptr) {
             dimen_3 = new double **[fil];
             for (int i=0; i<fil; i++){
                 dimen_3[i] = new double*[col];
@@ -195,7 +196,7 @@ public:
         return *this;
     };
 
-    static Tensor zeros(const vector<size_t> shape){
+    static Tensor zeros(const vector<size_t>& shape){
         double* val;
         if (shape.size() == 1){
             val = new double[shape[0]];
@@ -209,10 +210,18 @@ public:
                 val[i] = 0;
             }
         }
-        return Tensor(shape, val);
+        if (shape.size() == 3){
+            val = new double[shape[0] * shape[1] * shape[2]];
+            for (int i=0; i<(shape[0] * shape[1] * shape[2]); i++){
+                val[i] = 0;
+            }
+        }
+        Tensor ten = Tensor(shape, val);
+        delete [] val;
+        return ten;
     };
 
-    static Tensor ones(const vector<size_t> shape){
+    static Tensor ones(const vector<size_t>& shape){
         double* val;
         if (shape.size() == 1){
             val = new double[shape[0]];
@@ -226,10 +235,12 @@ public:
                 val[i] = 1;
             }
         }
-        return Tensor(shape, val);
+        Tensor ten = Tensor(shape, val);
+        delete [] val;
+        return ten;
     };
 
-    static Tensor random(const vector<size_t> shape, const double min, const double max){
+    static Tensor random(const vector<size_t>& shape, const double min, const double max){
         double* val;
         if (shape.size() == 1){
             val = new double[shape[0]];
@@ -243,7 +254,9 @@ public:
                 val[i] = rand() % (int(max - min + 1)) + int(min);
             }
         }
-        return Tensor(shape, val);
+        Tensor ten = Tensor(shape, val);
+        delete [] val;
+        return ten;
     };
 
     static Tensor arange(const int min, const int max) {
@@ -253,7 +266,40 @@ public:
         for (int i = 0; i < max-min; i++) {
             val[i] = min + i;
         }
-        return Tensor({(size_t)size}, val);
+        Tensor ten = Tensor({(size_t)size}, val);
+        delete [] val;
+        return ten;
+    }
+
+    Tensor view(const vector<size_t>& shape){
+        double* val;
+        int n = 0;
+        if (shape.size() == 1) {
+            val = new double[shape[0]];
+            for (int i = 0; i < shape[0]; i++){
+                val[i] = dimen_1[i];
+            }
+        }
+        else if (shape.size() == 2) {
+            val = new double[shape[0]];
+            for (int i = 0; i < shape[0]; i++) {
+                for (int j = 0; j < shape[1]; j++) {
+                    val[n++] = dimen_2[i][j];
+                }
+            }
+            return Tensor({(size_t)shape[0],(size_t)shape[1]},val);
+        }
+        else if (shape.size() == 3) {
+            val = new double[shape[0] * shape[1] * shape[2]];
+            for (int i=0; i<shape[0]; i++){
+                for (int j=0; j<shape[1]; j++){
+                    for (int k=0; k<shape[2]; k++){
+                        val[n++] = dimen_3[i][j][k];
+                    }
+                }
+            }
+            return Tensor({(size_t)shape[0],(size_t)shape[1],(size_t)shape[2]},val);
+        }
     }
 
     Tensor apply(const TensorTransform &transform ) const {};
@@ -298,7 +344,7 @@ public:
     }
 };
 
-Tensor operator+(const Tensor a, const Tensor b){
+Tensor operator+(const Tensor& a, const Tensor& b){
     if (a.fil == b.fil && a.col == b.col && a.anch == b.anch){
         double *valor;
         if (a.dimen_1 != nullptr) {
@@ -334,7 +380,7 @@ Tensor operator+(const Tensor a, const Tensor b){
     }
 }
 
-Tensor operator-(const Tensor a, const Tensor b){
+Tensor operator-(const Tensor& a, const Tensor& b){
     if (a.fil == b.fil && a.col == b.col && a.anch == b.anch){
         double *valor;
         if (a.dimen_1 != nullptr) {
@@ -370,7 +416,7 @@ Tensor operator-(const Tensor a, const Tensor b){
     }
 }
 
-Tensor operator*(const Tensor a, const Tensor b){
+Tensor operator*(const Tensor& a, const Tensor& b){
     if (a.fil == b.fil && a.col == b.col && a.anch == b.anch){
         double *valor;
         if (a.dimen_1 != nullptr) {
@@ -406,10 +452,41 @@ Tensor operator*(const Tensor a, const Tensor b){
     }
 }
 
+Tensor operator*(const Tensor& a, double n){
+    double *valor;
+    if (a.dimen_1 != nullptr) {
+        valor = new double[a.fil];
+        for (int i = 0; i < a.fil; i++) {
+            valor[i] = a.dimen_1[i] * n;
+        }
+        return Tensor({(size_t)a.fil},valor);
+    }
+    if (a.dimen_2 != nullptr) {
+        valor = new double[a.fil * a.col];
+        for (int i = 0; i < a.fil; i++) {
+            for (int j = 0; j < a.col; j++) {
+                valor[i*a.fil + j] = a.dimen_2[i][j] * n;
+            }
+        }
+        return Tensor({(size_t)a.fil,(size_t)a.col},valor);
+    }
+    if (a.dimen_3 != nullptr) {
+        valor = new double[a.fil * a.col * a.anch];
+        for (int i=0; i<a.fil; i++){
+            for (int j=0; j<a.col; j++){
+                for (int k=0; k<a.anch; k++){
+                    valor[k + j*a.col + i*a.fil] = a.dimen_3[i][j][k] * n;
+                }
+            }
+        }
+        return Tensor({(size_t)a.fil,(size_t)a.col,(size_t)a.anch},valor);
+    }
+}
+
 int main() {
     Tensor A = Tensor :: zeros ({3 , 3});
     A.imprimir();
-    Tensor B = Tensor :: ones ({3 , 3}) ;
+    Tensor B = Tensor :: ones ({2 , 3}) ;
     B.imprimir();
     Tensor C = Tensor :: random ({3 , 3} , 0.0 , 1.0) ;
     C.imprimir();
@@ -422,8 +499,11 @@ int main() {
     copi = B;
     copi.imprimir();
 
-    Tensor E = B - C ;
+    Tensor E = A + B ;
     E.imprimir();
+
+    Tensor F = C * 2.0;
+    F.imprimir();
 
     return 0;
 }
