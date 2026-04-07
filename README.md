@@ -12,5 +12,5 @@ Nombre:
 
 Ejecución:
 
-La ejecución solo requiere de ingresar la matriz de datos. El constructor y los métodos no funcionaran si recibe una matriz con muchas dimensiones al estar condicionados, solo llega a aceptar matrices de máximo 3 dimensiones.
+La ejecución no requiere ingresar datos solo iniciar. El constructor y los métodos no funcionaran si recibe una matriz con muchas dimensiones al estar condicionados, solo llega a aceptar matrices de máximo 3 dimensiones.
 

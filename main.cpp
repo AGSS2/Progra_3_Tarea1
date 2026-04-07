@@ -35,11 +35,12 @@ public:
         else if (shape.size() == 2){
             fil = shape[0];
             col = shape[1];
+            int n = 0;
             dimen_2 = new double*[fil];
             for (int i=0; i<fil; i++){
                 dimen_2[i] = new double[col];
                 for (int j=0; j<col; j++){
-                    dimen_2[i][j] = values[j + i * col];
+                    dimen_2[i][j] = values[n++];
                 }
             }
         }
@@ -48,12 +49,13 @@ public:
             col = shape[1];
             anch = shape[2];
             dimen_3 = new double**[fil];
+            int n = 0;
             for (int i=0; i<fil; i++){
                 dimen_3[i] = new double*[col];
                 for (int j=0; j<col; j++){
                     dimen_3[i][j] = new double[anch];
                     for (int k=0; k<anch; k++){
-                        dimen_3[i][j][k] = values[k + j*col + i*fil];
+                        dimen_3[i][j][k] = values[n++];
                     }
                 }
             }
@@ -204,13 +206,13 @@ public:
                 val[i] = 0;
             }
         }
-        if (shape.size() == 2){
+        else if (shape.size() == 2){
             val = new double[shape[0] * shape[1]];
             for (int i=0; i<(shape[0] * shape[1]); i++){
                 val[i] = 0;
             }
         }
-        if (shape.size() == 3){
+        else if (shape.size() == 3){
             val = new double[shape[0] * shape[1] * shape[2]];
             for (int i=0; i<(shape[0] * shape[1] * shape[2]); i++){
                 val[i] = 0;
@@ -229,9 +231,15 @@ public:
                 val[i] = 1;
             }
         }
-        if (shape.size() == 2){
+        else if (shape.size() == 2){
             val = new double[shape[0] * shape[1]];
             for (int i=0; i<(shape[0] * shape[1]); i++){
+                val[i] = 1;
+            }
+        }
+        else if (shape.size() == 3){
+            val = new double[shape[0] * shape[1] * shape[2]];
+            for (int i=0; i<(shape[0] * shape[1] * shape[2]); i++){
                 val[i] = 1;
             }
         }
@@ -248,10 +256,16 @@ public:
                 val[i] = rand() % (int(max - min + 1)) + int(min);
             }
         }
-        if (shape.size() == 2){
+        else if (shape.size() == 2){
             val = new double[shape[0] * shape[1]];
             for (int i=0; i<(shape[0] * shape[1]); i++){
                 val[i] = rand() % (int(max - min + 1)) + int(min);
+            }
+        }
+        else if (shape.size() == 3){
+            val = new double[shape[0] * shape[1] * shape[2]];
+            for (int i=0; i<(shape[0] * shape[1] * shape[2]); i++){
+                val[i] = 0;
             }
         }
         Tensor ten = Tensor(shape, val);
@@ -312,10 +326,22 @@ public:
             }
             cout << endl << endl;
         }
-        if (dimen_2 != nullptr){
+        else if (dimen_2 != nullptr){
             for (int i = 0; i < fil; i++) {
                 for (int j = 0; j < col; j++) {
                     cout << dimen_2[i][j] << " ";
+                }
+                cout << endl;
+            }
+            cout << endl;
+        }
+        else if (dimen_3 != nullptr){
+            for (int i = 0; i < fil; i++) {
+                for (int j = 0; j < col; j++) {
+                    for (int k=0; k < anch; k++){
+                        cout << dimen_3[i][j][k] << " ";
+                    }
+                    cout << endl;
                 }
                 cout << endl;
             }
@@ -484,6 +510,7 @@ Tensor operator*(const Tensor& a, double n){
 }
 
 int main() {
+    /*
     Tensor A = Tensor :: zeros ({3 , 3});
     A.imprimir();
     Tensor B = Tensor :: ones ({2 , 3}) ;
@@ -504,6 +531,9 @@ int main() {
 
     Tensor F = C * 2.0;
     F.imprimir();
+    */
+    Tensor red = Tensor :: zeros({1000,20,20});
+    //red.imprimir();
 
     return 0;
 }
